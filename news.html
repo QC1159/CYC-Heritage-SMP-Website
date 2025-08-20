@@ -1,10 +1,112 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8">
-  <title>$Title$</title>
+    <meta charset="UTF-8">
+    <title>CYC Heritage SMP</title>
+    <link rel="icon" type="image/png" href="/icon.png">
+    <link rel="stylesheet" href="./styles.css">
 </head>
 <body>
-$END$
+
+<header style="height: 70px; display: flex; align-items: center; justify-content: space-between; padding: 10px 20px; background-color: #333;">
+    <a href="./index.html" style="color: white; text-decoration: none; font-size: 1.5em;">
+        🌍 CYC Heritage SMP
+    </a>
+    <div>
+    <a href="./index.html" style="
+        background-color: #ff0000;
+        color: white;
+        padding: 8px 16px;
+        border-radius: 8px;
+        text-decoration: none;
+        font-weight: bold;
+        transition: background-color 0.3s;
+        margin-left: 16px;
+        text-align: center;
+    " onmouseover="this.style.backgroundColor='#cc0000';" onmouseout="this.style.backgroundColor='#ff0000';">
+        Home
+    </a>
+    <a href="./news.html" style="
+        background-color: #ff0000;
+        color: white;
+        padding: 8px 16px;
+        border-radius: 8px;
+        text-decoration: none;
+        font-weight: bold;
+        transition: background-color 0.3s;
+        margin-left: 16px;
+        text-align: center;
+    " onmouseover="this.style.backgroundColor='#cc0000';" onmouseout="this.style.backgroundColor='#ff0000';">
+        News
+    </a>
+    </div>
+</header>
+
+
+
+<footer>
+    <p style="position: absolute; left: 10px;">&copy; 2025 CYC Heritage SMP</p>
+    <a style="margin-right: 10px;" href="https://www.youtube.com/@CYCHeritageSMP" target="_blank" class="youtube-icon" aria-label="YouTube Channel">
+        <img src="https://cdn.jsdelivr.net/npm/simple-icons@v9/icons/youtube.svg" alt="YouTube" width="28" height="28">
+    </a>
+</footer>
+
+<script>
+    document.addEventListener("DOMContentLoaded", async () => {
+        const csvUrl = "https://docs.google.com/spreadsheets/d/1M0rXV5xH1FOOn49ha6fBrvpfvQPbtJMvkbVkZ9D4HOQ/export?format=csv&id=1M0rXV5xH1FOOn49ha6fBrvpfvQPbtJMvkbVkZ9D4HOQ&gid=0"; // Replace with your actual CSV URL
+
+        const response = await fetch(csvUrl);
+        const text = await response.text();
+        const rows = parseCSV(text);
+
+        // Filter out empty rows and reverse for newest first
+        const validRows = rows.filter(r => r.some(cell => cell.trim() !== "")).reverse();
+
+        const header = document.querySelector("header");
+
+        validRows.reverse().forEach(([title, body, styledText]) => {
+            const section = document.createElement("section");
+
+            const h2 = document.createElement("h2");
+            h2.textContent = title || "Untitled";
+
+            const p1 = document.createElement("p");
+            p1.textContent = body || "";
+
+            const p2 = document.createElement("p");
+            p2.textContent = styledText || "";
+            p2.style.color = "#ffcc00"; // Example style
+            p2.style.fontStyle = "italic";
+
+            section.appendChild(h2);
+            section.appendChild(p1);
+            section.appendChild(p2);
+
+            // Insert each section directly after the header, so newer ones stack on top
+            header.insertAdjacentElement("afterend", section);
+        });
+
+
+        // Scroll to top section
+        //const firstSection = document.querySelector("section");
+        //if (firstSection) firstSection.scrollIntoView({ behavior: "smooth" });
+    });
+
+    function parseCSV(text) {
+        const rows = [];
+        const lines = text.trim().split("\n");
+
+        for (const line of lines) {
+            const match = [...line.matchAll(/("([^"]*)"|[^,]+)(?=,|$)/g)];
+            const cells = match.map(m => m[2] || m[0]).map(cell => cell.trim());
+            rows.push(cells);
+        }
+
+        return rows;
+    }
+
+</script>
+
+
 </body>
 </html>
