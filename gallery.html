@@ -68,6 +68,8 @@
     </div>
 </header>
 
+<h1>Want to post an image? Contact me at jackhaney22@gmail.com</h1>
+
 <footer>
     <p style="position: absolute; left: 10px;">&copy; 2025 CYC Heritage SMP</p>
     <a style="margin-right: 10px;" href="https://qc1159.github.io/Quick-Chat/?chatwith=CYCHeritageSMP" target="_blank" class="quickchat-icon" aria-label="Quick Chat Page">
@@ -91,15 +93,18 @@
 
         const header = document.querySelector("header");
 
-        validRows.reverse().forEach(([title, body, styledText]) => {
-            if (title && body && styledText) {
+        validRows.reverse().forEach(([_1, _2, _3, _4, _5, title, image, styledText]) => {
+            if (title && image && styledText) {
                 const section = document.createElement("section");
 
                 const h2 = document.createElement("h2");
                 h2.textContent = title || "Untitled";
 
-                const p1 = document.createElement("p");
-                p1.textContent = body || "";
+                const p1 = document.createElement("img");
+                p1.src = image;
+
+                p1.style.width = "100%";
+                p1.style.borderRadius = "10px";
 
                 const p2 = document.createElement("p");
                 p2.textContent = styledText || "";
@@ -156,7 +161,6 @@
 
 
 </script>
-
 
 </body>
 </html>

@@ -1,8 +1,8 @@
 <!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <title>CYC Heritage SMP</title>
+        <html lang="en">
+        <head>
+        <meta charset="UTF-8">
+        <title>CYC Heritage SMP</title>
     <link rel="icon" type="image/png" href="icon.png">
     <link rel="stylesheet" href="./styles.css">
 </head>
@@ -68,26 +68,7 @@
     </div>
 </header>
 
-
-<section class="server-info">
-    <h2>Server Information</h2>
-    <p><strong>Minecraft Java IP:</strong> partner-indonesia.gl.joinmc.link</p>
-    <p><strong>Minecraft Bedrock IP:</strong> monday-moore.gl.at.ply.gg</p>
-    <p><strong>Minecraft Bedrock Port:</strong> 15940</p>
-</section>
-
-<section class="server-status" style="display: flex; gap: 20px;">
-    <div id="status-section" style="flex: 0 0 250px;"> <!-- fixed width for status -->
-        <h2>Server Status</h2>
-        <p><strong>Status:</strong> <span id="status">Loading...</span></p>
-        <p><strong>Players Online:</strong> <span id="players">Loading...</span></p>
-    </div>
-    <div id="player-list" style="flex: 1; max-height: 100%; overflow-y: auto; display: flex; flex-wrap: wrap; gap: 10px; background: rgba(255,255,255,0.1); padding: 10px; border-radius: 10px;">
-        <!-- Players will appear here -->
-    </div>
-</section>
-
-
+<h1>Want to register a team? Contact me at jackhaney22@gmail.com</h1>
 
 <footer>
     <p style="position: absolute; left: 10px;">&copy; 2025 CYC Heritage SMP</p>
@@ -100,38 +81,41 @@
 </footer>
 
 <script>
-    async function fetchServerStatus() {
-        const statusEl = document.getElementById('status');
-        const playersEl = document.getElementById('players');
-        const playerListEl = document.getElementById('player-list');
+    document.addEventListener("DOMContentLoaded", async () => {
+        const csvUrl = "https://docs.google.com/spreadsheets/d/1M0rXV5xH1FOOn49ha6fBrvpfvQPbtJMvkbVkZ9D4HOQ/export?format=csv&id=1M0rXV5xH1FOOn49ha6fBrvpfvQPbtJMvkbVkZ9D4HOQ&gid=0";
 
-        try {
-            const ip = "partner-indonesia.gl.joinmc.link";
+        const response = await fetch(csvUrl);
+        const text = await response.text();
+        const rows = parseCSV(text);
 
-            const response = await fetch('https://api.mcsrvstat.us/3/' + ip);
-            const data = await response.json();
+        // Filter out empty rows
+        const validRows = rows.filter(r => r.some(cell => cell.trim() !== ""));
 
-            statusEl.style.color = data.online ? 'white' : 'red';
-            statusEl.textContent = data.online ? 'Loading...' : 'Offline ❌';
-            playersEl.textContent = data.online ? 'Loading...' : '0';
+        const header = document.querySelector("header");
 
-            if (!data.online) return;
+        validRows.forEach(([_1, _2, _3, title, members]) => {
+            if (!title && !members) return;
 
-            const response2 = await fetch('https://mc-api.net/v3/server/ping/' + ip);
-            const data2 = await response2.json();
+            const section = document.createElement("section");
 
-            // Update status
-            statusEl.style.color = data.online ? 'lime' : 'red';
-            statusEl.textContent = data.online ? 'Online ✅' : 'Offline ❌';
-            playersEl.textContent = data.online ? `${data.players.online} / ${data.players.max}` : '0';
+            const h2 = document.createElement("h2");
+            h2.textContent = title || "Untitled";
 
-            playerSample = data2.players.sample;
+            const memberGrid = document.createElement("div");
+            memberGrid.style.display = "flex";
+            memberGrid.style.flexWrap = "wrap";
+            memberGrid.style.gap = "10px";
+            memberGrid.style.marginTop = "10px";
+            memberGrid.style.padding = "10px";
+            memberGrid.style.borderRadius = "10px";
+            memberGrid.style.background = "rgba(255,255,255,0.1)";
 
-            // Update player list
-            playerListEl.innerHTML = ''; // Clear previous
-            if (data2.online && data2.players.sample) {
-                data2.players.sample.forEach(player => {
-                    const playerDiv = document.createElement('div');
+            // Split members by comma
+            if (members) {
+                members.split(",").map(m => m.trim()).forEach(member => {
+                    if (!member) return;
+
+                    const playerDiv = document.createElement("div");
                     playerDiv.classList.add("player");
                     playerDiv.style.cursor = "pointer";
                     playerDiv.style.textAlign = 'center';
@@ -144,30 +128,25 @@
                     playerDiv.style.alignItems = 'center';
                     playerDiv.style.justifyContent = 'center';
 
-                    const img = document.createElement('img');
+                    const img = document.createElement("img");
 
-                    if (player.name.indexOf(".") === -1) {
+                    if (member.indexOf(".") === -1) {
+                        // Java edition
                         playerDiv.addEventListener('click', () => {
-                            window.open(`https://namemc.com/profile/${player.name}`, '_blank');
+                            window.open(`https://namemc.com/profile/${member}`, '_blank');
                         });
 
-                        img.src = `https://minotar.net/helm/${player.name}/50`; // fake head
-                        img.alt = player.name;
-                        img.style.borderRadius = '10%';
-                        img.style.display = 'block';
-                        img.style.marginBottom = '5px';
+                        img.src = `https://minotar.net/helm/${member}/50`;
                     } else {
+                        // Bedrock
                         playerDiv.addEventListener('click', (e) => {
-                            // Remove any existing tooltip
                             const existing = document.querySelector(".tooltip-note");
                             if (existing) existing.remove();
 
-                            // Create tooltip element
                             const tooltip = document.createElement("div");
                             tooltip.className = "tooltip-note";
                             tooltip.textContent = "This player is a bedrock player, no profile available.";
 
-                            // Position near cursor
                             tooltip.style.position = "absolute";
                             tooltip.style.left = e.pageX + 10 + "px";
                             tooltip.style.top = e.pageY + 10 + "px";
@@ -182,44 +161,72 @@
 
                             document.body.appendChild(tooltip);
 
-                            // Fade out after 2s
                             setTimeout(() => {
                                 tooltip.style.opacity = "0";
                                 setTimeout(() => tooltip.remove(), 300);
                             }, 2000);
                         });
 
-                        img.src = "https://minotar.net/helm/MHF_Steve/50"; // fake head
-                        img.alt = player.name;
-                        img.style.borderRadius = '10%';
-                        img.style.display = 'block';
-                        img.style.marginBottom = '5px';
+                        img.src = "https://minotar.net/helm/MHF_Steve/50";
                     }
 
+                    img.alt = member;
+                    img.style.borderRadius = '10%';
+                    img.style.display = 'block';
+                    img.style.marginBottom = '5px';
 
-
-                    const name = document.createElement('span');
-                    name.textContent = player.name;
+                    const name = document.createElement("span");
+                    name.textContent = member;
                     name.style.fontSize = '0.7em';
                     name.style.wordBreak = 'break-word';
 
                     playerDiv.appendChild(img);
                     playerDiv.appendChild(name);
-                    playerListEl.appendChild(playerDiv);
+                    memberGrid.appendChild(playerDiv);
                 });
             }
-        } catch (error) {
-            console.error('Error fetching server status:', error);
-            statusEl.textContent = 'Error ❌';
-            statusEl.style.color = 'red'
-            playersEl.textContent = '-';
-            playerListEl.innerHTML = '';
-        }
-    }
 
-    fetchServerStatus();
-    setInterval(fetchServerStatus, 30000);
+            section.appendChild(h2);
+            section.appendChild(memberGrid);
+
+            header.insertAdjacentElement("afterend", section);
+        });
+    });
+
+    function parseCSV(text) {
+        const rows = [];
+        const lines = text.trim().split("\n");
+
+        for (const line of lines) {
+            const cells = [];
+            let current = "";
+            let insideQuotes = false;
+
+            for (let i = 0; i < line.length; i++) {
+                const char = line[i];
+
+                if (char === '"' && line[i + 1] === '"') {
+                    // Escaped quote
+                    current += '"';
+                    i++;
+                } else if (char === '"') {
+                    insideQuotes = !insideQuotes;
+                } else if (char === ',' && !insideQuotes) {
+                    cells.push(current.trim());
+                    current = "";
+                } else {
+                    current += char;
+                }
+            }
+
+            cells.push(current.trim()); // push last cell
+            rows.push(cells);
+        }
+
+        return rows;
+    }
 </script>
+
 
 </body>
 </html>
